@@ -17,6 +17,9 @@ const
   KERNING = 1; // columns of blank space between letters
 
 type
+  TColorMode = (cmNone, cmFixed, cmRainbow);
+
+type
   TGlyphRows = array[0..GLYPH_H - 1] of string[GLYPH_W];
   TFontChar = record
     Ch: Char;
@@ -120,17 +123,37 @@ begin
   Result := blank;
 end;
 
-procedure PrintBanner(const Text: string);
+function ColorCode(const name: string): string;
 var
-  row, i: Integer;
+  n: string;
+begin
+  n := LowerCase(name);
+  if n = 'red' then Result := '31'
+  else if n = 'green' then Result := '32'
+  else if n = 'yellow' then Result := '33'
+  else if n = 'blue' then Result := '34'
+  else if n = 'magenta' then Result := '35'
+  else if n = 'cyan' then Result := '36'
+  else if n = 'white' then Result := '37'
+  else Result := '';
+end;
+
+procedure PrintBanner(const Text: string; ColorMode: TColorMode; FixedColor: string);
+const
+  ESC = #27;
+  RAINBOW: array[0..5] of string = ('31', '33', '32', '36', '34', '35');
+var
+  row, i, colorIdx: Integer;
   line: string;
   glyph: TGlyphRows;
   kerningGap: string;
+  segColor: string;
 begin
   kerningGap := StringOfChar(' ', KERNING);
   for row := 0 to GLYPH_H - 1 do
   begin
     line := '';
+    colorIdx := 0;
     for i := 1 to Length(Text) do
     begin
       if Text[i] = ' ' then
@@ -138,7 +161,18 @@ begin
       else
       begin
         glyph := FindGlyph(Text[i]);
-        line := line + glyph[row] + kerningGap;
+        case ColorMode of
+          cmFixed:
+            line := line + ESC + '[' + FixedColor + 'm' + glyph[row] + ESC + '[0m' + kerningGap;
+          cmRainbow:
+            begin
+              segColor := RAINBOW[colorIdx mod Length(RAINBOW)];
+              line := line + ESC + '[' + segColor + 'm' + glyph[row] + ESC + '[0m' + kerningGap;
+              Inc(colorIdx);
+            end;
+        else
+          line := line + glyph[row] + kerningGap;
+        end;
       end;
     end;
     WriteLn(line);
@@ -170,22 +204,65 @@ begin
   WriteLn('FancyWords - a tiny figlet clone written in Pascal');
   WriteLn;
   WriteLn('Usage:');
-  WriteLn('  fancywords <text>          render text given as arguments');
-  WriteLn('  echo "text" | fancywords   render text piped via stdin');
-  WriteLn('  fancywords -h | --help     show this help');
+  WriteLn('  fancywords <text>              render text given as arguments');
+  WriteLn('  echo "text" | fancywords       render text piped via stdin');
+  WriteLn('  fancywords -c <color> <text>   colored output');
+  WriteLn('  fancywords -c rainbow <text>   rainbow output (color per letter)');
+  WriteLn('  fancywords -h | --help         show this help');
+  WriteLn;
+  WriteLn('Colors: red, green, yellow, blue, magenta, cyan, white, rainbow');
 end;
 
 var
-  i: Integer;
+  i, argIdx: Integer;
   input: string;
+  colorMode: TColorMode;
+  fixedColor: string;
+  args: array of string;
 begin
-  if (ParamCount >= 1) and ((ParamStr(1) = '-h') or (ParamStr(1) = '--help')) then
+  colorMode := cmNone;
+  fixedColor := '';
+  SetLength(args, 0);
+
+  i := 1;
+  while i <= ParamCount do
   begin
-    PrintUsage;
-    Halt(0);
+    if (ParamStr(i) = '-h') or (ParamStr(i) = '--help') then
+    begin
+      PrintUsage;
+      Halt(0);
+    end
+    else if (ParamStr(i) = '-c') or (ParamStr(i) = '--color') then
+    begin
+      Inc(i);
+      if i > ParamCount then
+      begin
+        WriteLn('Error: -c/--color requires a value');
+        Halt(1);
+      end;
+      if LowerCase(ParamStr(i)) = 'rainbow' then
+        colorMode := cmRainbow
+      else
+      begin
+        fixedColor := ColorCode(ParamStr(i));
+        if fixedColor = '' then
+        begin
+          WriteLn('Unknown color: ', ParamStr(i));
+          WriteLn('Available: red, green, yellow, blue, magenta, cyan, white, rainbow');
+          Halt(1);
+        end;
+        colorMode := cmFixed;
+      end;
+    end
+    else
+    begin
+      SetLength(args, Length(args) + 1);
+      args[High(args)] := ParamStr(i);
+    end;
+    Inc(i);
   end;
 
-  if ParamCount = 0 then
+  if Length(args) = 0 then
   begin
     if IsPiped then
       input := ReadAllStdin
@@ -197,9 +274,9 @@ begin
   end
   else
   begin
-    input := ParamStr(1);
-    for i := 2 to ParamCount do
-      input := input + ' ' + ParamStr(i);
+    input := args[0];
+    for argIdx := 1 to High(args) do
+      input := input + ' ' + args[argIdx];
   end;
 
   if Trim(input) = '' then
@@ -208,5 +285,5 @@ begin
     Halt(1);
   end;
 
-  PrintBanner(input);
+  PrintBanner(input, colorMode, fixedColor);
 end.
