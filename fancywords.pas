@@ -9,7 +9,7 @@ program FancyWords;
   Covers: A-Z, a-z, 0-9, and basic punctuation: . , ! ? : ; - ' " ( ) }
 
 uses
-  SysUtils;
+  SysUtils, termio;
 
 const
   GLYPH_H = 12;
@@ -145,19 +145,68 @@ begin
   end;
 end;
 
+function IsPiped: Boolean;
+begin
+  // IsATTY returns 1 for an interactive terminal, 0 if redirected/piped
+  Result := IsATTY(Input) = 0;
+end;
+
+function ReadAllStdin: string;
+var
+  line: string;
+begin
+  Result := '';
+  while not Eof(Input) do
+  begin
+    ReadLn(line);
+    if Result <> '' then
+      Result := Result + ' ';
+    Result := Result + line;
+  end;
+end;
+
+procedure PrintUsage;
+begin
+  WriteLn('FancyWords - a tiny figlet clone written in Pascal');
+  WriteLn;
+  WriteLn('Usage:');
+  WriteLn('  fancywords <text>          render text given as arguments');
+  WriteLn('  echo "text" | fancywords   render text piped via stdin');
+  WriteLn('  fancywords -h | --help     show this help');
+end;
+
 var
   i: Integer;
   input: string;
 begin
-  if ParamCount = 0 then
+  if (ParamCount >= 1) and ((ParamStr(1) = '-h') or (ParamStr(1) = '--help')) then
   begin
-    WriteLn('Usage: fancywords <text>');
-    Halt(1);
+    PrintUsage;
+    Halt(0);
   end;
 
-  input := ParamStr(1);
-  for i := 2 to ParamCount do
-    input := input + ' ' + ParamStr(i);
+  if ParamCount = 0 then
+  begin
+    if IsPiped then
+      input := ReadAllStdin
+    else
+    begin
+      PrintUsage;
+      Halt(1);
+    end;
+  end
+  else
+  begin
+    input := ParamStr(1);
+    for i := 2 to ParamCount do
+      input := input + ' ' + ParamStr(i);
+  end;
+
+  if Trim(input) = '' then
+  begin
+    PrintUsage;
+    Halt(1);
+  end;
 
   PrintBanner(input);
 end.
