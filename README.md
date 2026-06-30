@@ -27,10 +27,10 @@ No external font libraries, no system dependencies — just a compiler and a ter
 
 ## Features
 
-- 🔤 Render any text as ASCII-art banners
-- ⚡ Single static binary, no runtime dependencies
-- 🎨 Custom built-in font(s)
-- 🖥️ Cross-platform (Linux / Windows, anywhere Free Pascal runs)
+- Render any text as ASCII-art banners
+- Single static binary, no runtime dependencies
+- Custom built-in font(s)
+- Cross-platform (Linux / Windows, anywhere Free Pascal runs)
 
 ## Demo
 
@@ -53,17 +53,18 @@ sudo pacman -S fpc
 
 git clone https://github.com/bakaforlive/FancyWords.git
 cd FancyWords
-fpc fancywords.pas
 ```
 
 ## Usage
 
 ```bash
-fancywords your text here
+./fancywords
+(your text after executing command)
 ```
 
 ## Roadmap
 
+- [ ] Single 'fancywords (text)' command
 - [ ] Multiple fonts
 - [ ] Color output
 - [ ] Width/alignment options
