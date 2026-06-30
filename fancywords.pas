@@ -30,6 +30,7 @@ const
 type
   TColorMode = (cmNone, cmFixed, cmRainbow);
   TSizeMode = (szSmall, szStandard, szBig);
+  TBorderStyle = (bsNone, bsSimple, bsDouble, bsDots, bsStars, bsPlus, bsWaves, bsHash);
 
 type
   TGlyphRows = array[0..MAX_GLYPH_H - 1] of string[MAX_GLYPH_W];
@@ -143,6 +144,47 @@ begin
   W := SPACE_W;
 end;
 
+function DupStr(const s: string; n: Integer): string;
+var
+  i: Integer;
+begin
+  Result := '';
+  for i := 1 to n do
+    Result := Result + s;
+end;
+
+procedure BorderChars(style: TBorderStyle; out TL, TR, BL, BR, H, V: string);
+begin
+  case style of
+    bsSimple: begin TL := '+'; TR := '+'; BL := '+'; BR := '+'; H := '-'; V := '|'; end;
+    bsDouble: begin TL := '╔'; TR := '╗'; BL := '╚'; BR := '╝'; H := '═'; V := '║'; end;
+    bsDots:   begin TL := '.'; TR := '.'; BL := '.'; BR := '.'; H := '.'; V := ':'; end;
+    bsStars:  begin TL := '*'; TR := '*'; BL := '*'; BR := '*'; H := '*'; V := '*'; end;
+    bsPlus:   begin TL := '+'; TR := '+'; BL := '+'; BR := '+'; H := '+'; V := '+'; end;
+    bsWaves:  begin TL := '~'; TR := '~'; BL := '~'; BR := '~'; H := '~'; V := '~'; end;
+    bsHash:   begin TL := '#'; TR := '#'; BL := '#'; BR := '#'; H := '#'; V := '#'; end;
+  else
+    begin TL := ''; TR := ''; BL := ''; BR := ''; H := ''; V := ''; end;
+  end;
+end;
+
+function BorderStyleFromName(const name: string; out style: TBorderStyle): Boolean;
+var
+  n: string;
+begin
+  n := LowerCase(name);
+  Result := True;
+  if n = 'simple' then style := bsSimple
+  else if n = 'double' then style := bsDouble
+  else if n = 'dots' then style := bsDots
+  else if n = 'stars' then style := bsStars
+  else if n = 'plus' then style := bsPlus
+  else if n = 'waves' then style := bsWaves
+  else if n = 'hash' then style := bsHash
+  else
+    Result := False;
+end;
+
 function ColorCode(const name: string): string;
 var
   n: string;
@@ -193,7 +235,7 @@ begin
   Result := lines;
 end;
 
-procedure PrintColored(const lines: array of string; ColorMode: TColorMode; FixedColor: string; Bordered: Boolean);
+procedure PrintColored(const lines: array of string; ColorMode: TColorMode; FixedColor: string; Bordered: Boolean; V: string);
 const
   ESC = #27;
   RAINBOW: array[0..5] of string = ('31', '33', '32', '36', '34', '35');
@@ -255,7 +297,7 @@ begin
     if Bordered then
     begin
       padLen := maxLen - Length(lines[row]);
-      WriteLn('| ' + outLine + StringOfChar(' ', padLen) + ' |');
+      WriteLn(V + ' ' + outLine + StringOfChar(' ', padLen) + ' ' + V);
     end
     else
       WriteLn(outLine);
@@ -291,11 +333,12 @@ begin
   WriteLn('  fancywords -s <size> <text>        choose font height');
   WriteLn('  fancywords -c <color> <text>       colored output');
   WriteLn('  fancywords -c rainbow <text>       rainbow output (color per letter)');
-  WriteLn('  fancywords -b <text>               draw a border around the banner');
+  WriteLn('  fancywords -b <style> <text>       draw a border around the banner');
   WriteLn('  fancywords -h | --help             show this help');
   WriteLn;
   WriteLn('Sizes: small, standard (default), big');
   WriteLn('Colors: red, green, yellow, blue, magenta, cyan, white, rainbow');
+  WriteLn('Borders: simple, double, dots, stars, plus, waves, hash');
   WriteLn('Supports: A-Z a-z 0-9, Cyrillic А-Я а-я, and common punctuation.');
 end;
 
@@ -305,7 +348,8 @@ var
   colorMode: TColorMode;
   sizeMode: TSizeMode;
   fixedColor: string;
-  border: Boolean;
+  borderStyle: TBorderStyle;
+  bTL, bTR, bBL, bBR, bH, bV: string;
   args: array of string;
   codepoints: specialize TArray<Cardinal>;
   lines: TStringArray;
@@ -313,7 +357,7 @@ begin
   colorMode := cmNone;
   sizeMode := szStandard;
   fixedColor := '';
-  border := False;
+  borderStyle := bsNone;
   SetLength(args, 0);
 
   i := 1;
@@ -326,7 +370,18 @@ begin
     end
     else if (ParamStr(i) = '-b') or (ParamStr(i) = '--border') then
     begin
-      border := True;
+      Inc(i);
+      if i > ParamCount then
+      begin
+        WriteLn('Error: -b/--border requires a value');
+        Halt(1);
+      end;
+      if not BorderStyleFromName(ParamStr(i), borderStyle) then
+      begin
+        WriteLn('Unknown border: ', ParamStr(i));
+        WriteLn('Available: simple, double, dots, stars, plus, waves, hash');
+        Halt(1);
+      end;
     end
     else if (ParamStr(i) = '-s') or (ParamStr(i) = '--size') then
     begin
@@ -409,16 +464,17 @@ begin
     szBig:      lines := BuildLines(codepoints, FONT_BIG, FONT_BIG_H);
   end;
 
-  if border then
+  if borderStyle <> bsNone then
   begin
+    BorderChars(borderStyle, bTL, bTR, bBL, bBR, bH, bV);
     maxLineLen := 0;
     for i := 0 to High(lines) do
       if Length(lines[i]) > maxLineLen then
         maxLineLen := Length(lines[i]);
-    WriteLn('+' + StringOfChar('-', maxLineLen + 2) + '+');
-    PrintColored(lines, colorMode, fixedColor, True);
-    WriteLn('+' + StringOfChar('-', maxLineLen + 2) + '+');
+    WriteLn(bTL + DupStr(bH, maxLineLen + 2) + bTR);
+    PrintColored(lines, colorMode, fixedColor, True, bV);
+    WriteLn(bBL + DupStr(bH, maxLineLen + 2) + bBR);
   end
   else
-    PrintColored(lines, colorMode, fixedColor, False);
+    PrintColored(lines, colorMode, fixedColor, False, '');
 end.
