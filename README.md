@@ -1,10 +1,10 @@
 ```
-    ______                      _       __               __    
-   / ____/___ _____  _______  _| |     / /___  _________/ /____
-  / /_  / __ `/ __ \/ ___/ / / / | /| / / __ \/ ___/ __  / ___/
- / __/ / /_/ / / / / /__/ /_/ /| |/ |/ / /_/ / /  / /_/ (__  ) 
-/_/    \__,_/_/ /_/\___/\__, / |__/|__/\____/_/   \__,_/____/  
-                       /____/                                  
+  _____                                 __        __                     _       
+ |  ___|   __ _   _ __     ___   _   _  \ \      / /   ___    _ __    __| |  ___ 
+ | |_     / _` | | '_ \   / __| | | | |  \ \ /\ / /   / _ \  | '__|  / _` | / __|
+ |  _|   | (_| | | | | | | (__  | |_| |   \ V  V /   | (_) | | |    | (_| | \__ \
+ |_|      \__,_| |_| |_|  \___|  \__, |    \_/\_/     \___/  |_|     \__,_| |___/
+                                 |___/                                               
 ```
 
 <p align="center">
@@ -21,26 +21,25 @@
 
 ## About
 
-**FancyWords** turns plain text into big ASCII-art banners, right in your terminal — a lightweight, dependency-free alternative to [figlet](http://www.figlet.org/), built entirely from scratch in **Pascal**.
+**FancyWords** turns plain text into big ASCII-art banners, right in your terminal - a lightweight, dependency-free alternative to [figlet](http://www.figlet.org/), built entirely from scratch in **Pascal**.
 
-No external font libraries, no system dependencies — just a compiler and a terminal.
+No external font libraries, no system dependencies - just a compiler and a terminal.
 
 ## Features
 
 - Render any text as ASCII-art banners
 - Single static binary, no runtime dependencies
-- Custom built-in font(s)
 - Cross-platform (Linux / Windows, anywhere Free Pascal runs)
 
 ## Demo
 
 ```
 $ fancywords Hello
- _   _      _ _
-| | | | ___| | | ___
-| |_| |/ _ \ | |/ _ \
-|  _  |  __/ | | (_) |
-|_| |_|\___|_|_|\___/
+  _              _   _         
+ | |__     ___  | | | |   ___  
+ | '_ \   / _ \ | | | |  / _ \ 
+ | | | | |  __/ | | | | | (_) |
+ |_| |_|  \___| |_| |_|  \___/ 
 ```
 
 ## Build
@@ -53,6 +52,7 @@ sudo pacman -S fpc
 
 git clone https://github.com/bakaforlive/FancyWords.git
 cd FancyWords
+fpc fancywords.pas
 ```
 
 ## Usage
@@ -64,11 +64,11 @@ cd FancyWords
 
 ## Roadmap
 
-- [+] Single 'fancywords (text)' command
-- [ Will be added ] Multiple fonts
-- [ Will be added ] Color output
-- [ Will be added] Width/alignment options
-- [ Will be added ] Pipe support (`echo "text" | ./fancywords`)
+- [ ] Single 'fancywords (text)' command
+- [ ] Multiple fonts
+- [ ] Color output
+- [ ] Width/alignment options
+- [ ] Pipe support (`echo "text" | ./fancywords`)
 
 ## Contributing
 
