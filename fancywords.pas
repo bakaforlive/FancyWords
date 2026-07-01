@@ -7,6 +7,10 @@ function CharToIndex_inc(ch: char): integer;
 begin
   if (ch >= 'a') and (ch <= 'z') then
     CharToIndex_inc := Ord(ch) - Ord('a')
+  else if (ch >= 'A') and (ch <= 'Z') then
+    CharToIndex_inc := Ord(ch) - Ord('a')
+  else if (ch >= '0') and (ch <= '9') then
+    CharToIndex_inc := Ord(ch) - Ord('0')
   else
     CharToIndex_inc := -1;
 end;
@@ -24,7 +28,6 @@ type
   end;
 
 {$I fontdata_small.inc}
-{$I fontdata_big.inc}
 
 var
   UserRequest: string;
