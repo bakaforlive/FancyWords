@@ -64,11 +64,11 @@ cd FancyWords
 
 ## Roadmap
 
-- [ ] Single 'fancywords (text)' command
-- [ ] Multiple fonts
-- [ ] Color output
-- [ ] Width/alignment options
-- [ ] Pipe support (`echo "text" | ./fancywords`)
+- [+] Single 'fancywords (text)' command
+- [ Will be added ] Multiple fonts
+- [ Will be added ] Color output
+- [ Will be added] Width/alignment options
+- [ Will be added ] Pipe support (`echo "text" | ./fancywords`)
 
 ## Contributing
 
