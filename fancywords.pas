@@ -12,7 +12,7 @@ begin
 end;
 
 const
-  FONT_SMALL_H = 17;
+  FONT_SMALL_H = 6;
 
 type
   TLetter = array[0..FONT_SMALL_H - 1] of string;
