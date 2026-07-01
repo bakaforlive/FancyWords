@@ -5,12 +5,8 @@ program fancywords;
 
 function CharToIndex_inc(ch: char): integer;
 begin
-  if (ch >= 'a') and (ch <= 'z') then
-    CharToIndex_inc := Ord(ch) - Ord('a')
-  else if (ch >= 'A') and (ch <= 'Z') then
-    CharToIndex_inc := Ord(ch) - Ord('a')
-  else if (ch >= '0') and (ch <= '9') then
-    CharToIndex_inc := Ord(ch) - Ord('0')
+  if (Ord(ch) >= $20) and (Ord(ch) <= $7E) then
+    CharToIndex_inc := Ord(ch) - $20
   else
     CharToIndex_inc := -1;
 end;
