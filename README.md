@@ -64,11 +64,11 @@ fpc fancywords.pas
 
 ## Roadmap
 
-- [ ] Single 'fancywords (text)' command
-- [ ] Multiple fonts
-- [ ] Color output
-- [ ] Width/alignment options
-- [ ] Pipe support (`echo "text" | ./fancywords`)
+- [ + ] Single 'fancywords (text)' command
+- [ not added ] Multiple fonts
+- [ not added ] Color output
+- [ not added ] Width/alignment options
+- [ not added ] Pipe support (`echo "text" | ./fancywords`)
 
 ## Contributing
 
