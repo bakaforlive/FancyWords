@@ -1,6 +1,6 @@
 const
-FONT_SMALL_COUNT = 95;
-FONT_SMALL: array[0..FONT_SMALL_COUNT - 1] of TFontChar = (
+FONT_COUNT = 95;
+FONT: array[0..FONT_COUNT - 1] of TFontChar = (
 
     // --- Punctuation / symbols ($0020-$002F) ---
     (Code: $0020; W: 2; Rows: ('  ', '  ', '  ', '  ', '  ', '  ')),
