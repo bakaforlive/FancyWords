@@ -3,7 +3,7 @@ program fancywords;
 {Turns into object pascal mode}
 {$mode objfpc}{$H+}
 
-function CharToIndex_inc(ch: char): integer;
+function CharToIndex_inc(ch: char): integer; { Translate char to ASCII number }
 begin
   if (Ord(ch) >= $20) and (Ord(ch) <= $7E) then
     CharToIndex_inc := Ord(ch) - $20
@@ -12,18 +12,18 @@ begin
 end;
 
 const
-  FONT_SMALL_H = 17;
+  FONT_HEIGHT = 6; { Width + Height }
 
 type
-  TLetter = array[0..FONT_SMALL_H - 1] of string;
+  TLetter = array[0..FONT_HEIGHT - 1] of string;
 
   TFontChar = record
      Code: Cardinal;
      W: Integer;
-     Rows: TLetter;   // rows
+     Rows: TLetter; 
   end;
 
-{$I fontdata_small.inc}
+{$I fontdata.inc} { include ASCII Figlet-Like Letters }
 
 var
   UserRequest: string;
@@ -36,13 +36,14 @@ begin
   readln(UserRequest);
   CharactersNum := length(UserRequest);
 
-  for i := 0 to FONT_SMALL_H - 1 do
+  { Print ASCII letters line by line}
+  for i := 0 to FONT_HEIGHT - 1 do
   begin
     for j := 0 to CharactersNum - 1 do
     begin
       indexer := CharToIndex_inc(UserRequest[j + 1]);
       if indexer >= 0 then
-        write(FONT_SMALL[indexer].Rows[i]);
+        write(FONT[indexer].Rows[i]);
     end;
     writeln;
   end;
